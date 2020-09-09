@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include "glm/glm.hpp"
+
 // create a struct for every type of shape
 
 struct circle
@@ -11,9 +13,10 @@ struct circle
 
 // create AABB (axis-aligned bounding box)
 
-struct AABB 
+struct aabb 
 {
-	glm::vec2 center;
+	glm::vec2 max;
+	glm::vec2 min;
 };
 
 enum class shapeType : uint8_t
@@ -30,8 +33,12 @@ struct collider
 	union 
 	{
 		circle circleData;
+		aabb aabbData;
 		// add the data for an AABB
 	};
 };
 
-
+bool checkCircleCircle(glm::vec2 posA, circle circleA, glm::vec2 posB, circle circleB);
+bool checkCircleCircle(glm::vec2 posA, collider circleA, glm::vec2 posB, collider circleB);
+bool checkCircleAABB(glm::vec2 posA, circle circle, glm::vec2 posB, aabb aabb);
+bool checkCircleAABB(glm::vec2 posA, collider circle, glm::vec2 posB, collider aabb);

@@ -7,7 +7,6 @@ physObject::physObject()
 	forces = glm::vec2{ 0,0 };
 
 	mass = 1.0f;
-	shape = { shapeType::CIRCLE, circle{10.0f} };
 }
 
 void physObject::tickPhysics(float deltaTime)
@@ -24,10 +23,17 @@ void physObject::draw() const
 	{
 	case shapeType::NONE:
 		DrawPixel((int)pos.x, (int)pos.y, RED);
+		break;
 	case shapeType::CIRCLE:
 		DrawCircleLines((int)pos.x, (int)pos.y, shape.circleData.radius, RED);
-	//case shapeType::AABB:
-	//	assert(false && "AABB not yet implemented");
+		break;
+	case shapeType::AABB:
+		// implement draw AABB
+		DrawLine((int)shape.aabbData.min.x, (int)shape.aabbData.min.y, (int)shape.aabbData.max.x, (int)shape.aabbData.min.y, BLUE);
+		DrawLine((int)shape.aabbData.max.x, (int)shape.aabbData.min.y, (int)shape.aabbData.max.x, (int)shape.aabbData.max.y, BLUE);
+		DrawLine((int)shape.aabbData.max.x, (int)shape.aabbData.max.y, (int)shape.aabbData.min.x, (int)shape.aabbData.max.y, BLUE);
+		DrawLine((int)shape.aabbData.min.x, (int)shape.aabbData.max.y, (int)shape.aabbData.min.x, (int)shape.aabbData.min.y, BLUE);
+		//assert(false && "AABB not yet implemented");
 	default:
 		break;
 	}
