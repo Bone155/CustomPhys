@@ -13,7 +13,7 @@ void physObject::tickPhysics(float deltaTime)
 {
 	vel += forces * deltaTime;
 	forces = { 0,0 };
-	// implement linear drag
+	// implement linear drag // ask terry about linear drag
 	pos += vel * deltaTime;
 }
 

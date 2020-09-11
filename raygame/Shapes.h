@@ -34,7 +34,7 @@ struct collider
 	{
 		circle circleData;
 		aabb aabbData;
-		// add the data for an AABB
+		// add the data for an AABB // done
 	};
 };
 
@@ -42,3 +42,5 @@ bool checkCircleCircle(glm::vec2 posA, circle circleA, glm::vec2 posB, circle ci
 bool checkCircleCircle(glm::vec2 posA, collider circleA, glm::vec2 posB, collider circleB);
 bool checkCircleAABB(glm::vec2 posA, circle circle, glm::vec2 posB, aabb aabb);
 bool checkCircleAABB(glm::vec2 posA, collider circle, glm::vec2 posB, collider aabb);
+bool checkAabbAabb(aabb aabbA, aabb aabbB);
+bool checkAabbAabb(collider aabbA, collider aabbB);

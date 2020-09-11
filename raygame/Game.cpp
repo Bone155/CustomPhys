@@ -58,10 +58,11 @@ bool Game::tick()
 	}
 	if (IsMouseButtonPressed(2)) {
 		auto cursorPos = GetMousePosition();
-
+		glm::vec2 max = { 10.0f, 10.0f };
+		glm::vec2 min = { 1.0f, 1.0f };
 		physObject spawn;
 		spawn.pos = { cursorPos.x, cursorPos.y };
-		//spawn.shape = { shapeType::AABB, aabb{ {10, 10}, {-10, -10} } };
+		//spawn.shape = { shapeType::AABB, aabb{ max, min } }; // ask terry for help
 		spawn.mass = (rand() % 10) + 1;
 		spawn.addImpulse({ 100, 0 });
 
@@ -70,9 +71,12 @@ bool Game::tick()
 	// right-click and push all of the nearby particles within a radius
 	if (IsMouseButtonPressed(1)) {
 		auto cursorPos = GetMousePosition();
-		
+		glm::vec2 curs = { cursorPos.x, cursorPos.y };
 		for (auto& obj : physobjects) {
-			
+			float distance = glm::length(curs - obj.pos);
+			if (distance <= 15) {
+				obj.addForce({ 0, -100 });
+			}
 		}
 
 		/*float radius = 15;
