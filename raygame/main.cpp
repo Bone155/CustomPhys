@@ -16,9 +16,11 @@
 int main()
 {
 	Game app;
-
+	// Game * app = new demoGame();
 	app.init();
-	
+	// app tagrertFixed = 1.0f / 30.0f
+	// app gravityScale = 50.0f
+	app.useGravity = true;
 	bool shouldRun = true;
 	// Main game loop
 	while (shouldRun)    // Detect window close button or ESC key

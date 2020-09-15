@@ -31,5 +31,9 @@ public:
 	void addAccel(glm::vec2 accel);
 
 	void addVelocityChange(glm::vec2 velChange);
+
+	// onCollisionEnter
+	// onCollisionStay
+	// onCollisionExit
 };
 

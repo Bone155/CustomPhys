@@ -5,7 +5,7 @@ physObject::physObject()
 	pos = glm::vec2{0,0};
 	vel = glm::vec2{ 0,0 };
 	forces = glm::vec2{ 0,0 };
-
+	shape.colliderShape = shapeType::NONE;
 	mass = 1.0f;
 }
 
@@ -28,12 +28,8 @@ void physObject::draw() const
 		DrawCircleLines((int)pos.x, (int)pos.y, shape.circleData.radius, RED);
 		break;
 	case shapeType::AABB:
-		// implement draw AABB
-		DrawLine((int)shape.aabbData.min.x, (int)shape.aabbData.min.y, (int)shape.aabbData.max.x, (int)shape.aabbData.min.y, BLUE);
-		DrawLine((int)shape.aabbData.max.x, (int)shape.aabbData.min.y, (int)shape.aabbData.max.x, (int)shape.aabbData.max.y, BLUE);
-		DrawLine((int)shape.aabbData.max.x, (int)shape.aabbData.max.y, (int)shape.aabbData.min.x, (int)shape.aabbData.max.y, BLUE);
-		DrawLine((int)shape.aabbData.min.x, (int)shape.aabbData.max.y, (int)shape.aabbData.min.x, (int)shape.aabbData.min.y, BLUE);
-		//assert(false && "AABB not yet implemented");
+		// implement draw AABB // done
+		DrawRectangleLines(pos.x, pos.y, shape.aabbData.width, shape.aabbData.height, BLUE);
 	default:
 		break;
 	}

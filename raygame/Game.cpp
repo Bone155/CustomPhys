@@ -13,15 +13,27 @@ collisionMap setupCollisionChecks() {
 	collisionMap map;
 
 	map[collisionPair(shapeType::CIRCLE | shapeType::CIRCLE)] = checkCircleCircle;
-	
+	map[collisionPair(shapeType::CIRCLE | shapeType::AABB)] = checkCircleAABB;
+	map[collisionPair(shapeType::AABB | shapeType::AABB)] = checkAabbAabb;
 	// add CIRCLE-AABB check
 	// add AABB-AABB check
 
 	return map;
 }
 
+gatherMap setupGatherFunctions() {
+	gatherMap map;
+
+	map[(collisionPair)(shapeType::CIRCLE | shapeType::CIRCLE)] = gatherCircleCircle;
+	map[(collisionPair)(shapeType::CIRCLE | shapeType::AABB)] = gatherCircleAABB;
+	map[(collisionPair)(shapeType::AABB | shapeType::AABB)] = gatherAabbAabb;
+
+	return map;
+}
+
 // define the static variable in game
 collisionMap Game::collisionCheckers = setupCollisionChecks();
+gatherMap Game::gatherFunctions = setupGatherFunctions();
 
 Game::Game()
 {
@@ -49,25 +61,28 @@ bool Game::tick()
 
 		physObject spawn;
 		spawn.pos = { cursorPos.x, cursorPos.y };
-		spawn.shape = { shapeType::CIRCLE, circle{10.0f} };
-		spawn.mass = (rand() % 10) + 1;
+		spawn.shape = { shapeType::CIRCLE };
+		spawn.mass = (float)(rand() % 30) + 10.0f;
 		spawn.shape.circleData.radius = spawn.mass;
-		spawn.addImpulse({ 100, 0 });
+		spawn.addImpulse({ 400, 0 });
 
 		physobjects.push_back(spawn);
 	}
+
 	if (IsMouseButtonPressed(2)) {
 		auto cursorPos = GetMousePosition();
-		glm::vec2 max = { 10.0f, 10.0f };
-		glm::vec2 min = { 1.0f, 1.0f };
+		
 		physObject spawn;
 		spawn.pos = { cursorPos.x, cursorPos.y };
-		//spawn.shape = { shapeType::AABB, aabb{ max, min } }; // ask terry for help
-		spawn.mass = (rand() % 10) + 1;
-		spawn.addImpulse({ 100, 0 });
+		spawn.shape = { shapeType::AABB };
+		spawn.shape.aabbData.width = 40.0f; //(float)(rand() % 30) + 10.0f;
+		spawn.shape.aabbData.height = 40.0f; //(float)(rand() % 30) + 10.0f;
+		spawn.mass = (spawn.shape.aabbData.width + spawn.shape.aabbData.height)/2;
+		spawn.addImpulse({ -800, 0 });
 
 		physobjects.push_back(spawn);
 	}
+
 	// right-click and push all of the nearby particles within a radius
 	if (IsMouseButtonPressed(1)) {
 		auto cursorPos = GetMousePosition();
@@ -120,7 +135,21 @@ void Game::tickPhysics()
 			bool collision = collisionCheckers[pairType](first->pos, first->shape, second->pos, second->shape);
 
 			if (collision) {
-				std::cout << "collision" << std::endl;
+				float pen = 0.0f;
+				glm::vec2 normal = gatherFunctions[pairType](first->pos, first->shape, second->pos, second->shape, pen);
+
+				glm::vec2 resImpulses[2];
+				resolveCollision(first->pos, first->vel, first->mass,
+					second->pos, second->vel, second->mass,
+					1.0f, normal, resImpulses);
+
+				// pen *= 1.001f;
+
+				first->pos += normal * pen;
+				second->pos -= normal * pen;
+
+				first->vel = resImpulses[0];
+				second->vel = resImpulses[1];
 			}
 			
 		}
@@ -130,7 +159,8 @@ void Game::tickPhysics()
 
 	for (auto& obj : physobjects) {
 		obj.tickPhysics(fixedTimeStep);
-		obj.addForce({ 0,9.8 });
+		if (useGravity)
+			obj.addForce({ 0, 9.8 });
 		if (obj.pos.x >= GetScreenWidth()) {
 			obj.pos.x = 0;
 		}

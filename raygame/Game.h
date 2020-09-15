@@ -11,8 +11,12 @@
 // in order to test whether they are in collision
 
 using collisionPair = uint8_t; // type-alias, like a typedef
+
 using collisionFunc = bool(*)(glm::vec2, collider, glm::vec2, collider);
 using collisionMap = std::unordered_map<collisionPair, collisionFunc>;
+
+using gatherFunc = glm::vec2(*)(glm::vec2, collider, glm::vec2, collider, float&);
+using gatherMap = std::unordered_map<collisionPair, gatherFunc>;
 
 class Game
 {
@@ -20,6 +24,7 @@ class Game
 	std::vector<physObject> physobjects;
 
 	static collisionMap collisionCheckers;
+	static gatherMap gatherFunctions;
 public:
 	float fixedTimeStep;
 
@@ -36,5 +41,14 @@ public:
 	void draw() const;
 
 	void exit();
+
+	// bool shouldClose() const
+	// bool shouldPhysics() const
+
+	// float targetFixedStep
+	// float gravityScale
+
+	bool useGravity;
+
 };
 
