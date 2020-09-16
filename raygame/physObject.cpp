@@ -5,15 +5,21 @@ physObject::physObject()
 	pos = glm::vec2{0,0};
 	vel = glm::vec2{ 0,0 };
 	forces = glm::vec2{ 0,0 };
+
 	shape.colliderShape = shapeType::NONE;
+
 	mass = 1.0f;
+	drag = 1.0f;
 }
 
 void physObject::tickPhysics(float deltaTime)
 {
 	vel += forces * deltaTime;
 	forces = { 0,0 };
+	
 	// implement linear drag // ask terry about linear drag
+	vel *= (1.0f - deltaTime * drag);
+
 	pos += vel * deltaTime;
 }
 
@@ -29,10 +35,8 @@ void physObject::draw() const
 		break;
 	case shapeType::AABB:
 		// implement draw AABB // done
-		glm::vec2 min = { pos.x, pos.y };
-		glm::vec2 max = { pos.x + (shape.aabbData.width), pos.y - (shape.aabbData.height) };
-		DrawRectangleLines(pos.x, pos.y, shape.aabbData.width, shape.aabbData.height, BLUE);
-		DrawCircle(min.x, min.y, 5, GREEN);
+		DrawRectangleLines(pos.x - shape.aabbData.halfExtents.x, pos.y - shape.aabbData.halfExtents.y,
+						   shape.aabbData.halfExtents.x * 2, shape.aabbData.halfExtents.y * 2, BLUE);
 	default:
 		break;
 	}
@@ -51,7 +55,7 @@ void physObject::addImpulse(glm::vec2 impulse)
 
 void physObject::addAccel(glm::vec2 accel, float deltaTime)
 {
-	vel += accel * deltaTime;
+	forces += accel;
 }
 
 void physObject::addVelocityChange(glm::vec2 velChang)

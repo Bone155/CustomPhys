@@ -62,8 +62,8 @@ bool Game::tick()
 		physObject spawn;
 		spawn.pos = { cursorPos.x, cursorPos.y };
 		spawn.shape = { shapeType::CIRCLE };
-		spawn.mass = (float)(rand() % 30) + 10.0f;
-		spawn.shape.circleData.radius = spawn.mass;
+		spawn.shape.circleData.radius = 15.0f;
+		spawn.mass = 1.0f;
 		spawn.addImpulse({ 150, 0 });
 
 		physobjects.push_back(spawn);
@@ -75,35 +75,24 @@ bool Game::tick()
 		physObject spawn;
 		spawn.pos = { cursorPos.x, cursorPos.y };
 		spawn.shape = { shapeType::AABB };
-		spawn.shape.aabbData.width = (float)(rand() % 30) + 20.0f;
-		spawn.shape.aabbData.height = (float)(rand() % 30) + 20.0f;
-		spawn.mass = spawn.shape.aabbData.width + spawn.shape.aabbData.height;
+		spawn.shape.aabbData.halfExtents = { 15, 15 };
+		spawn.mass = 1.0f;
 		spawn.addImpulse({ -300, 0 });
 
 		physobjects.push_back(spawn);
 	}
 
-	// right-click and push all of the nearby particles within a radius
+	// right-click and push all of the nearby particles within a radius // done
 	if (IsMouseButtonPressed(1)) {
 		auto cursorPos = GetMousePosition();
 		glm::vec2 curs = { cursorPos.x, cursorPos.y };
 		for (auto& obj : physobjects) {
 			float distance = glm::length(curs - obj.pos);
-			if (distance <= 15) {
-				obj.addForce({ 0, -1000 });
+			if (distance <= 50) {
+				obj.vel *= -30;
 			}
 		}
 
-		/*float radius = 15;
-		for (auto& obj : physobjects) {
-			glm::vec2 distance = {(obj.pos.x - cursorPos.x),(obj.pos.y - cursorPos.y)};
-			if (distance.x <= radius) {
-				obj.addForce({ -25, 0 });
-			}
-			if (distance.y <= radius) {
-				obj.addForce({ 0, -225 });
-			}
-		}*/
 	}
 
 	return !WindowShouldClose();
@@ -113,9 +102,7 @@ void Game::tickPhysics()
 {
 	accumulatedDeltaTime -= fixedTimeStep;
 
-
 	// test for collision
-	// optimize with spatial partioning
 	for (auto& lhs : physobjects) {
 		for (auto& rhs : physobjects) {
 			if (&lhs == &rhs) { continue; }
@@ -161,19 +148,15 @@ void Game::tickPhysics()
 			obj.addForce({ 0, 9.8 });
 		if (obj.pos.x >= (float)GetScreenWidth()) {
 			obj.pos.x = 0;
-			obj.addVelocityChange({ 350,0 });
 		}
 		if (obj.pos.y >= (float)GetScreenHeight()) {
 			obj.pos.y = 0;
-			obj.addAccel(glm::vec2{ 0,1300 }, fixedTimeStep);
 		}
 		if (obj.pos.x <= 0) {
 			obj.pos.x = (float)GetScreenWidth();
-			obj.addVelocityChange({ -350,0 });
 		}
 		if (obj.pos.y <= 0) {
 			obj.pos.y = (float)GetScreenHeight();
-			obj.addAccel(glm::vec2{ 0,-1300 }, fixedTimeStep);
 		}
 	}
 	// wrap the object the level // done

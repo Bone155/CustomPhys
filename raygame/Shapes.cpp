@@ -19,11 +19,9 @@ bool checkCircleCircle(glm::vec2 posA, collider circleA, glm::vec2 posB, collide
 
 bool checkCircleAABB(glm::vec2 posA, circle circle, glm::vec2 posB, aabb aabb)
 {
-	glm::vec2 distance = posB - posA;
-	glm::vec2 clampdst = glm::clamp(distance, glm::vec2{ posB - (aabb.width * 0.5f) }, glm::vec2{ posB + (aabb.height * 0.5f) });
-	glm::vec2 closestPoint = posB + clampdst;
-
-	return glm::length(closestPoint - posA) > circle.radius;
+	float distX = posA.x - glm::clamp(posA.x, posB.x - aabb.halfExtents.x, posB.x + aabb.halfExtents.x);
+	float distY = posA.y - glm::clamp(posA.y, posB.y - aabb.halfExtents.y, posB.y + aabb.halfExtents.y);
+	return (distX * distX + distY * distY) < (circle.radius * circle.radius);
 }
 
 bool checkCircleAABB(glm::vec2 posA, collider circle, glm::vec2 posB, collider aabb)
@@ -33,7 +31,10 @@ bool checkCircleAABB(glm::vec2 posA, collider circle, glm::vec2 posB, collider a
 
 bool checkAabbAabb(glm::vec2 posA, aabb aabbA, glm::vec2 posB, aabb aabbB)
 {
-	return !(aabbB.width < aabbA.width || aabbA.width < aabbB.width || aabbB.height < aabbA.height || aabbA.height < aabbB.height);
+	return !(posA.x - aabbA.halfExtents.x < posB.x + aabbB.halfExtents.x &&
+		   posA.x + aabbA.halfExtents.x > posB.x - aabbB.halfExtents.x &&
+		   posA.y - aabbA.halfExtents.y < posB.y + aabbB.halfExtents.y &&
+		   posA.y + aabbA.halfExtents.y > posB.y - aabbB.halfExtents.y);
 }
 
 bool checkAabbAabb(glm::vec2 posA, collider aabbA, glm::vec2 posB, collider aabbB)
@@ -59,12 +60,8 @@ glm::vec2 gatherCircleCircle(glm::vec2 posA, collider circleA, glm::vec2 posB, c
 glm::vec2 gatherCircleAABB(glm::vec2 posA, circle circle, glm::vec2 posB, aabb aabb, float& pen)
 {
 	float dist = glm::length(posA - posB);
-
-	float hafWid = aabb.width;
-	float hafHei = aabb.height;
-
-	float sumX = hafWid + circle.radius;
-	float sumY = hafHei + circle.radius;
+	float sumX = aabb.halfExtents.x + circle.radius;
+	float sumY = aabb.halfExtents.y + circle.radius;
 
 	pen = sumX - dist || sumY - dist;
 
@@ -78,7 +75,7 @@ glm::vec2 gatherCircleAABB(glm::vec2 posA, collider circle, glm::vec2 posB, coll
 
 glm::vec2 gatherAabbAabb(glm::vec2 posA, aabb aabbA, glm::vec2 posB, aabb aabbB, float& pen)
 {
-	pen = ((aabbA.width - aabbB.width) < (aabbA.height - aabbB.height) || (aabbA.width - aabbB.width) > (aabbA.height - aabbB.height));
+	pen = ((aabbA.halfExtents.x - aabbB.halfExtents.x) < (aabbA.halfExtents.y - aabbB.halfExtents.y) || (aabbA.halfExtents.x - aabbB.halfExtents.x) > (aabbA.halfExtents.y - aabbB.halfExtents.y));
 	return glm::normalize(posA - posB);
 }
 

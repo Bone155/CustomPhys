@@ -15,8 +15,7 @@ struct circle
 
 struct aabb 
 {
-	float width;
-	float height;
+	glm::vec2 halfExtents;
 };
 
 enum class shapeType : uint8_t

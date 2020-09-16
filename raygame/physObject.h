@@ -15,6 +15,7 @@ public:
 	glm::vec2 vel;
 	//mass
 	float mass;
+	float drag;
 	
 	collider shape;
 
