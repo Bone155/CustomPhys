@@ -19,9 +19,11 @@ bool checkCircleCircle(glm::vec2 posA, collider circleA, glm::vec2 posB, collide
 
 bool checkCircleAABB(glm::vec2 posA, circle circle, glm::vec2 posB, aabb aabb)
 {
-	float distance = glm::length(posA - posB);
-	float sum = circle.radius * circle.radius;
-	return distance < sum;
+	glm::vec2 distance = posB - posA;
+	glm::vec2 clampdst = glm::clamp(distance, glm::vec2{ posB - (aabb.width * 0.5f) }, glm::vec2{ posB + (aabb.height * 0.5f) });
+	glm::vec2 closestPoint = posB + clampdst;
+
+	return glm::length(closestPoint - posA) > circle.radius;
 }
 
 bool checkCircleAABB(glm::vec2 posA, collider circle, glm::vec2 posB, collider aabb)
@@ -31,17 +33,7 @@ bool checkCircleAABB(glm::vec2 posA, collider circle, glm::vec2 posB, collider a
 
 bool checkAabbAabb(glm::vec2 posA, aabb aabbA, glm::vec2 posB, aabb aabbB)
 {
-	float hafWidA = aabbA.width * 0.5f;
-	float hafHeiA = aabbA.height * 0.5f;
-	float hafWidB = aabbB.width * 0.5f;
-	float hafHeiB = aabbB.height * 0.5f;
-
-	glm::vec2 minA = { posA.x - hafWidA,  posA.y - hafHeiA};
-	glm::vec2 maxA = { posA.x + hafWidA,  posA.y + hafHeiA};
-	glm::vec2 minB = { posB.x - hafWidB,  posB.y - hafHeiB};
-	glm::vec2 maxB = { posB.x + hafWidB,  posB.y + hafHeiB};
-
-	return !(maxB.x < minA.x || maxA.x < minB.x || maxB.y < minA.y || maxA.y < minB.y);
+	return !(aabbB.width < aabbA.width || aabbA.width < aabbB.width || aabbB.height < aabbA.height || aabbA.height < aabbB.height);
 }
 
 bool checkAabbAabb(glm::vec2 posA, collider aabbA, glm::vec2 posB, collider aabbB)
@@ -67,8 +59,14 @@ glm::vec2 gatherCircleCircle(glm::vec2 posA, collider circleA, glm::vec2 posB, c
 glm::vec2 gatherCircleAABB(glm::vec2 posA, circle circle, glm::vec2 posB, aabb aabb, float& pen)
 {
 	float dist = glm::length(posA - posB);
-	float sum = circle.radius * circle.radius;
-	pen = sum - dist;
+
+	float hafWid = aabb.width;
+	float hafHei = aabb.height;
+
+	float sumX = hafWid + circle.radius;
+	float sumY = hafHei + circle.radius;
+
+	pen = sumX - dist || sumY - dist;
 
 	return glm::normalize(posA - posB);
 }

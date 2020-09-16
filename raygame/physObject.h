@@ -28,7 +28,7 @@ public:
 
 	void addImpulse(glm::vec2 impulse);
 
-	void addAccel(glm::vec2 accel);
+	void addAccel(glm::vec2 accel, float deltaTime);
 
 	void addVelocityChange(glm::vec2 velChange);
 

@@ -29,7 +29,10 @@ void physObject::draw() const
 		break;
 	case shapeType::AABB:
 		// implement draw AABB // done
+		glm::vec2 min = { pos.x, pos.y };
+		glm::vec2 max = { pos.x + (shape.aabbData.width), pos.y - (shape.aabbData.height) };
 		DrawRectangleLines(pos.x, pos.y, shape.aabbData.width, shape.aabbData.height, BLUE);
+		DrawCircle(min.x, min.y, 5, GREEN);
 	default:
 		break;
 	}
@@ -46,12 +49,12 @@ void physObject::addImpulse(glm::vec2 impulse)
 	vel += impulse / mass;
 }
 
-void physObject::addAccel(glm::vec2 accel)
+void physObject::addAccel(glm::vec2 accel, float deltaTime)
 {
-
+	vel += accel * deltaTime;
 }
 
 void physObject::addVelocityChange(glm::vec2 velChang)
 {
-
+	vel += velChang;
 }

@@ -12,9 +12,9 @@
 collisionMap setupCollisionChecks() {
 	collisionMap map;
 
-	map[collisionPair(shapeType::CIRCLE | shapeType::CIRCLE)] = checkCircleCircle;
-	map[collisionPair(shapeType::CIRCLE | shapeType::AABB)] = checkCircleAABB;
-	map[collisionPair(shapeType::AABB | shapeType::AABB)] = checkAabbAabb;
+	map[(collisionPair)(shapeType::CIRCLE | shapeType::CIRCLE)] = checkCircleCircle;
+	map[(collisionPair)(shapeType::CIRCLE | shapeType::AABB)] = checkCircleAABB;
+	map[(collisionPair)(shapeType::AABB | shapeType::AABB)] = checkAabbAabb;
 	// add CIRCLE-AABB check
 	// add AABB-AABB check
 
@@ -39,7 +39,7 @@ Game::Game()
 {
 	accumulatedDeltaTime = 0.0f;
 	fixedTimeStep = 1.0f / 30.0f;
-
+	useGravity = true;
 	srand(time(0));
 }
 
@@ -48,7 +48,7 @@ void Game::init()
 	int screenWidth = 800;
 	int screenHeight = 450;
 
-	InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
+	InitWindow(screenWidth, screenHeight, "Custom Physics Simulation");
 
 	SetTargetFPS(60);
 }
@@ -64,7 +64,7 @@ bool Game::tick()
 		spawn.shape = { shapeType::CIRCLE };
 		spawn.mass = (float)(rand() % 30) + 10.0f;
 		spawn.shape.circleData.radius = spawn.mass;
-		spawn.addImpulse({ 400, 0 });
+		spawn.addImpulse({ 150, 0 });
 
 		physobjects.push_back(spawn);
 	}
@@ -75,10 +75,10 @@ bool Game::tick()
 		physObject spawn;
 		spawn.pos = { cursorPos.x, cursorPos.y };
 		spawn.shape = { shapeType::AABB };
-		spawn.shape.aabbData.width = 40.0f; //(float)(rand() % 30) + 10.0f;
-		spawn.shape.aabbData.height = 40.0f; //(float)(rand() % 30) + 10.0f;
-		spawn.mass = (spawn.shape.aabbData.width + spawn.shape.aabbData.height)/2;
-		spawn.addImpulse({ -800, 0 });
+		spawn.shape.aabbData.width = (float)(rand() % 30) + 20.0f;
+		spawn.shape.aabbData.height = (float)(rand() % 30) + 20.0f;
+		spawn.mass = spawn.shape.aabbData.width + spawn.shape.aabbData.height;
+		spawn.addImpulse({ -300, 0 });
 
 		physobjects.push_back(spawn);
 	}
@@ -90,7 +90,7 @@ bool Game::tick()
 		for (auto& obj : physobjects) {
 			float distance = glm::length(curs - obj.pos);
 			if (distance <= 15) {
-				obj.addForce({ 0, -100 });
+				obj.addForce({ 0, -1000 });
 			}
 		}
 
@@ -129,7 +129,7 @@ void Game::tickPhysics()
 				second = &lhs;
 			}
 			// the type of collision to test for
-			collisionPair pairType = collisionPair(lhs.shape.colliderShape | rhs.shape.colliderShape);
+			collisionPair pairType = (collisionPair)(lhs.shape.colliderShape | rhs.shape.colliderShape);
 
 			// the collision check function to call and call it
 			bool collision = collisionCheckers[pairType](first->pos, first->shape, second->pos, second->shape);
@@ -142,8 +142,6 @@ void Game::tickPhysics()
 				resolveCollision(first->pos, first->vel, first->mass,
 					second->pos, second->vel, second->mass,
 					1.0f, normal, resImpulses);
-
-				// pen *= 1.001f;
 
 				first->pos += normal * pen;
 				second->pos -= normal * pen;
@@ -161,17 +159,21 @@ void Game::tickPhysics()
 		obj.tickPhysics(fixedTimeStep);
 		if (useGravity)
 			obj.addForce({ 0, 9.8 });
-		if (obj.pos.x >= GetScreenWidth()) {
+		if (obj.pos.x >= (float)GetScreenWidth()) {
 			obj.pos.x = 0;
+			obj.addVelocityChange({ 350,0 });
 		}
-		if (obj.pos.y >= GetScreenHeight()) {
+		if (obj.pos.y >= (float)GetScreenHeight()) {
 			obj.pos.y = 0;
+			obj.addAccel(glm::vec2{ 0,1300 }, fixedTimeStep);
 		}
 		if (obj.pos.x <= 0) {
-			obj.pos.x = GetScreenWidth();
+			obj.pos.x = (float)GetScreenWidth();
+			obj.addVelocityChange({ -350,0 });
 		}
 		if (obj.pos.y <= 0) {
-			obj.pos.y = GetScreenHeight();
+			obj.pos.y = (float)GetScreenHeight();
+			obj.addAccel(glm::vec2{ 0,-1300 }, fixedTimeStep);
 		}
 	}
 	// wrap the object the level // done
