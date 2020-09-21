@@ -17,7 +17,7 @@ void physObject::tickPhysics(float deltaTime)
 	vel += forces * deltaTime;
 	forces = { 0,0 };
 	
-	// implement linear drag // ask terry about linear drag
+	// implement linear drag // done
 	vel *= (1.0f - deltaTime * drag);
 
 	pos += vel * deltaTime;
@@ -35,8 +35,6 @@ void physObject::draw() const
 		break;
 	case shapeType::AABB:
 		// implement draw AABB // done
-		/*DrawRectangleLines((int)pos.x, (int)pos.y,
-						   (int)shape.aabbData.width, (int)shape.aabbData.height, BLUE);*/
 		DrawRectangleLines(pos.x - shape.aabbData.halfExtents.x, pos.y - shape.aabbData.halfExtents.y,
 						   shape.aabbData.halfExtents.x * 2, shape.aabbData.halfExtents.y * 2, BLUE);
 	default:

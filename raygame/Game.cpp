@@ -76,8 +76,6 @@ bool Game::tick()
 		spawn.pos = { cursorPos.x, cursorPos.y };
 		spawn.shape = { shapeType::AABB };
 		spawn.shape.aabbData.halfExtents = { 15, 15 };
-		//spawn.shape.aabbData.width = 30;
-		//spawn.shape.aabbData.height = 30;
 		spawn.mass = 1.0f;
 		spawn.addImpulse({ -300, 0 });
 
@@ -161,15 +159,6 @@ void Game::tickPhysics()
 			obj.pos.y = (float)GetScreenHeight();
 		}
 
-		////  check the distance between the mouse cursor and the object
-		//if (glm::distance(glm::vec2{ cursorPos.x, cursorPos.y }, targets.pos) < 50)
-		//{
-		//	//  Push the objects away from the mouse
-		//	glm::vec2 direction = glm::normalize(glm::vec2{ targets.pos.x - cursorPos.x , targets.pos.y - cursorPos.y });
-		//	direction.x *= 30;
-		//	direction.y *= 30;
-		//	targets.addImpulse(direction);
-		//}
 	}
 	// wrap the object the level // done
 }

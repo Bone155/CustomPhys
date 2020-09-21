@@ -19,19 +19,6 @@ bool checkCircleCircle(glm::vec2 posA, collider circleA, glm::vec2 posB, collide
 
 bool checkCircleAABB(glm::vec2 posA, circle circle, glm::vec2 posB, aabb aabb)
 {
-	////  get the disttance between the two shapes
-	//float distance = glm::length(posA - posB);
-
-	////  get the sum of the radius and hypotenuse
-	//float sum = circle.radius + sqrt(aabb.width * aabb.width + aabb.height * aabb.height);
-
-	////  return distance < sum
-	//return (posA.x + aabb.width / 2 > posB.x - circle.radius &&
-	//	posA.x - aabb.width / 2 < posB.x + circle.radius &&
-	//	posA.y + aabb.height / 2 > posB.y - circle.radius &&
-	//	posA.y - aabb.height / 2 < posB.y + circle.radius &&
-	//	distance < sum);
-	
 	//  get the disttance between the two shapes
 	float distance = glm::length(posA - posB);
 
@@ -44,10 +31,6 @@ bool checkCircleAABB(glm::vec2 posA, circle circle, glm::vec2 posB, aabb aabb)
 		posA.y + aabb.halfExtents.y > posB.y - circle.radius &&
 		posA.y - aabb.halfExtents.y < posB.y + circle.radius &&
 		distance < sum);
-
-	/*float distX = posA.x - glm::clamp(posA.x, posB.x - aabb.halfExtents.x, posB.x + aabb.halfExtents.x);
-	float distY = posA.y - glm::clamp(posA.y, posB.y - aabb.halfExtents.y, posB.y + aabb.halfExtents.y);
-	return (distX * distX + distY * distY) < (circle.radius * circle.radius);*/
 }
 
 bool checkCircleAABB(glm::vec2 posA, collider circle, glm::vec2 posB, collider aabb)
@@ -57,14 +40,10 @@ bool checkCircleAABB(glm::vec2 posA, collider circle, glm::vec2 posB, collider a
 
 bool checkAabbAabb(glm::vec2 posA, aabb aabbA, glm::vec2 posB, aabb aabbB)
 {
-	/*return (posA.x + aabbA.width / 2 > posB.x - aabbB.width / 2 &&
-		posA.x - aabbA.width / 2 < posB.x + aabbB.width / 2 &&
-		posA.y + aabbA.height / 2 > posB.y - aabbB.height / 2 &&
-		posA.y - aabbA.height / 2 < posB.y + aabbB.height / 2);*/
-	return !(posA.x - aabbA.halfExtents.x < posB.x + aabbB.halfExtents.x &&
-		     posA.x + aabbA.halfExtents.x > posB.x - aabbB.halfExtents.x &&
-		     posA.y - aabbA.halfExtents.y < posB.y + aabbB.halfExtents.y &&
-		     posA.y + aabbA.halfExtents.y > posB.y - aabbB.halfExtents.y);
+	return (posA.x + aabbA.halfExtents.x > posB.x - aabbB.halfExtents.x &&
+		     posA.x - aabbA.halfExtents.x < posB.x + aabbB.halfExtents.x &&
+		     posA.y + aabbA.halfExtents.y > posB.y - aabbB.halfExtents.y &&
+		     posA.y - aabbA.halfExtents.y < posB.y + aabbB.halfExtents.y);
 }
 
 bool checkAabbAabb(glm::vec2 posA, collider aabbA, glm::vec2 posB, collider aabbB)
@@ -89,21 +68,6 @@ glm::vec2 gatherCircleCircle(glm::vec2 posA, collider circleA, glm::vec2 posB, c
 
 glm::vec2 gatherCircleAABB(glm::vec2 posA, circle circle, glm::vec2 posB, aabb aabb, float& pen)
 {
-	////  calculate their distance
-	//float dist = glm::length(posA - posB);
-
-	////  check the penetration level and move it based on the most penetrated side
-	//if (posA.x + aabb.width / 2 - posB.x - circle.radius / 2 > posA.y + aabb.height / 2 - posB.y - circle.radius / 2)
-	//{
-	//	float sum = aabb.width / 2 + circle.radius;
-	//	pen = sum - dist;
-	//}
-	//else
-	//{
-	//	float sum = aabb.height / 2 + circle.radius;
-	//	pen = sum - dist;
-	//}
-	
 	//  calculate their distance
 	float dist = glm::length(posA - posB);
 
@@ -129,37 +93,21 @@ glm::vec2 gatherCircleAABB(glm::vec2 posA, collider circle, glm::vec2 posB, coll
 
 glm::vec2 gatherAabbAabb(glm::vec2 posA, aabb aabbA, glm::vec2 posB, aabb aabbB, float& pen)
 {
-	////  calculate their distance
-	//float dist = glm::length(posA - posB);
-
-	////  check the penetration level and move it based on the most penetrated side
-	//if (posA.x + aabbA.width / 2 - posB.x - aabbB.width / 2 > posA.y + aabbA.height / 2 - posB.y - aabbB.height / 2)
-	//{
-	//	float sum = (aabbA.width + aabbB.width) / 2;
-	//	pen = sum - dist;
-	//}
-	//else
-	//{
-	//	float sum = (aabbA.height + aabbB.height) / 2;
-	//	pen = sum - dist;
-	//}
-	
 	//  calculate their distance
 	float dist = glm::length(posA - posB);
 
 	//  check the penetration level and move it based on the most penetrated side
 	if (((posA.x + aabbA.halfExtents.x) - (posB.x - aabbB.halfExtents.x)) > (posA.y + aabbA.halfExtents.y) - (posB.y - aabbB.halfExtents.y))
 	{
-		float sum = (aabbA.halfExtents.x + aabbB.halfExtents.x) / 2;
+		float sum = aabbA.halfExtents.x + aabbB.halfExtents.x;
 		pen = sum - dist;
 	}
 	else
 	{
-		float sum = (aabbA.halfExtents.y + aabbB.halfExtents.y) / 2;
+		float sum = aabbA.halfExtents.y + aabbB.halfExtents.y;
 		pen = sum - dist;
 	}
 
-	//pen = ((aabbA.halfExtents.x - aabbB.halfExtents.x) < (aabbA.halfExtents.y - aabbB.halfExtents.y) || (aabbA.halfExtents.x - aabbB.halfExtents.x) > (aabbA.halfExtents.y - aabbB.halfExtents.y));
 	return glm::normalize(posA - posB);
 }
 

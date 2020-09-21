@@ -33,8 +33,5 @@ public:
 
 	void addVelocityChange(glm::vec2 velChange);
 
-	// onCollisionEnter
-	// onCollisionStay
-	// onCollisionExit
 };
 

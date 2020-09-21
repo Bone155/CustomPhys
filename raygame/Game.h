@@ -42,12 +42,6 @@ public:
 
 	void exit();
 
-	// bool shouldClose() const
-	// bool shouldPhysics() const
-
-	// float targetFixedStep
-	// float gravityScale
-
 	bool useGravity;
 
 };
