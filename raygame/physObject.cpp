@@ -35,6 +35,8 @@ void physObject::draw() const
 		break;
 	case shapeType::AABB:
 		// implement draw AABB // done
+		/*DrawRectangleLines((int)pos.x, (int)pos.y,
+						   (int)shape.aabbData.width, (int)shape.aabbData.height, BLUE);*/
 		DrawRectangleLines(pos.x - shape.aabbData.halfExtents.x, pos.y - shape.aabbData.halfExtents.y,
 						   shape.aabbData.halfExtents.x * 2, shape.aabbData.halfExtents.y * 2, BLUE);
 	default:
