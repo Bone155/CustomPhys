@@ -56,15 +56,15 @@ void Game::init()
 bool Game::tick()
 {
 	accumulatedDeltaTime += GetFrameTime();
+
 	if (IsMouseButtonPressed(0)) {
 		auto cursorPos = GetMousePosition();
 
 		physObject spawn;
 		spawn.pos = { cursorPos.x, cursorPos.y };
 		spawn.shape = { shapeType::CIRCLE };
-		spawn.shape.circleData.radius = 15.0f;
-		spawn.mass = 1.0f;
-		spawn.addImpulse({ 150, 0 });
+		spawn.shape.circleData.radius = (rand() % 10) + 5.0f;
+		spawn.mass = spawn.shape.circleData.radius;
 
 		physobjects.push_back(spawn);
 	}
@@ -75,9 +75,8 @@ bool Game::tick()
 		physObject spawn;
 		spawn.pos = { cursorPos.x, cursorPos.y };
 		spawn.shape = { shapeType::AABB };
-		spawn.shape.aabbData.halfExtents = { 15, 15 };
-		spawn.mass = 1.0f;
-		spawn.addImpulse({ -300, 0 });
+		spawn.shape.aabbData.halfExtents = { (float)(rand() % 10) + 5.0f, (float)(rand() % 10) + 5.0f };
+		spawn.mass = spawn.shape.aabbData.halfExtents.x + spawn.shape.aabbData.halfExtents.y;
 
 		physobjects.push_back(spawn);
 	}
@@ -87,9 +86,11 @@ bool Game::tick()
 		auto cursorPos = GetMousePosition();
 		glm::vec2 curs = { cursorPos.x, cursorPos.y };
 		for (auto& obj : physobjects) {
-			float distance = glm::length(curs - obj.pos);
-			if (distance <= 50) {
-				obj.vel *= -30;
+			if (glm::distance(glm::vec2{ cursorPos.x, cursorPos.y }, obj.pos) < 75) {
+				glm::vec2 direction = glm::normalize(glm::vec2{ obj.pos.x - cursorPos.x , obj.pos.y - cursorPos.y });
+				direction.x *= 150;
+				direction.y *= 150;
+				obj.addImpulse(direction);
 			}
 		}
 
@@ -138,6 +139,7 @@ void Game::tickPhysics()
 			}
 			
 		}
+
 	}
 	
 	// add gravity for all physics objects // done
@@ -146,16 +148,16 @@ void Game::tickPhysics()
 		obj.tickPhysics(fixedTimeStep);
 		if (useGravity)
 			obj.addAccel({ 0, 9.8 }, fixedTimeStep);
-		if (obj.pos.x >= (float)GetScreenWidth()) {
+		if (obj.pos.x > (float)GetScreenWidth()) {
 			obj.pos.x = 0;
 		}
-		if (obj.pos.y >= (float)GetScreenHeight()) {
+		if (obj.pos.y > (float)GetScreenHeight()) {
 			obj.pos.y = 0;
 		}
-		if (obj.pos.x <= 0) {
+		if (obj.pos.x < 0) {
 			obj.pos.x = (float)GetScreenWidth();
 		}
-		if (obj.pos.y <= 0) {
+		if (obj.pos.y < 0) {
 			obj.pos.y = (float)GetScreenHeight();
 		}
 
